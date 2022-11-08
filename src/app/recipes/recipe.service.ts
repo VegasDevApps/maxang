@@ -51,6 +51,7 @@ export class RecipeService {
     }
 
     updateRecipe(index: number, recipe: Recipe){
+        console.log('Privet');
         this.recipes[index] = recipe;
         this.recipeChanged.next(this.recipes.slice());
     }
