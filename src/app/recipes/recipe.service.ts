@@ -9,7 +9,8 @@ export class RecipeService {
 
     recipeChanged = new Subject<Recipe[]>();
 
-    private recipes: Recipe[] = [
+    private recipes: Recipe[] = [];
+    private recipes_old: Recipe[] = [
         new Recipe(
             'A test recipe 1',
             'This is simply a test 1',
@@ -32,6 +33,11 @@ export class RecipeService {
     ];
 
     constructor(private shoppingListService: ShoppingListService){}
+
+    setRecipes(recipes: Recipe[]) {
+        this.recipes = recipes;
+        this.recipeChanged.next(this.recipes.slice());
+    }
 
     getRecipes() {
         return this.recipes.slice();
