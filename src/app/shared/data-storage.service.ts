@@ -26,11 +26,7 @@ export class DataStorageService {
 
         return this.authService.user.pipe(take(1), exhaustMap(user => {
             return this.http.get<Recipe[]>(
-                'https://maxang-df23e-default-rtdb.europe-west1.firebasedatabase.app/recipes.json',
-                {
-                    params: new HttpParams().set('auth', user.token)
-                }
-            )
+                'https://maxang-df23e-default-rtdb.europe-west1.firebasedatabase.app/recipes.json')
         }), map(res => {
                 return res.map(rec => {
                     return {
