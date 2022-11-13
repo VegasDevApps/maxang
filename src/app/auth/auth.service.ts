@@ -1,5 +1,6 @@
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { Router } from "@angular/router";
 import { BehaviorSubject, catchError, Observable, Subject, tap, throwError } from "rxjs";
 import { User } from "./user.model";
 
@@ -15,7 +16,7 @@ export interface AuthResponseData {
 @Injectable({ providedIn: "root" })
 export class AuthService {
 
-    constructor(private http: HttpClient) {}
+    constructor(private http: HttpClient, private router: Router) {}
 
     user = new BehaviorSubject<User>(null);
 
@@ -35,10 +36,36 @@ export class AuthService {
             }));
     }
 
+    logout(){
+        this.user.next(null);
+        this.router.navigate(['/']);
+    }
+
+    autoLogin(){
+
+        const userData: {
+            email: string;
+            id: string;
+            _token: string;
+            _expirationDate: string;
+        } = JSON.parse(localStorage.getItem('userData'));
+
+        if(!userData){
+            return;
+        }
+
+        const user = new User(userData.email, userData.id, userData._token, new Date(userData._expirationDate));
+
+        if(user.token){
+            this.user.next(user);
+        }
+    }
+
     private handleLogUser(email: string, localId: string, idToken: string, expiresIn: number) {
         const expirationDate = new Date(new Date().getTime() + expiresIn * 1000);
-                const user = new User(email, localId, idToken, expirationDate);
-                this.user.next(user);
+        const user = new User(email, localId, idToken, expirationDate);
+        this.user.next(user);
+        localStorage.setItem('userData', JSON.stringify(user));
     }
 
     private handlerError(errorResponse: HttpErrorResponse) {

@@ -14,7 +14,7 @@
             </ul>
             <ul class="nav navbar-nav navbar-right" *ngIf="isAuth">
                 <li>
-                    <a style="cursor: pointer;">
+                    <a style="cursor: pointer;" (click)="onLogout()">
                         Logout
                     </a>
                 </li>
