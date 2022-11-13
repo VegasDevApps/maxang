@@ -19,6 +19,7 @@ export class AuthService {
     constructor(private http: HttpClient, private router: Router) {}
 
     user = new BehaviorSubject<User>(null);
+    private logoutTimer: any = null;
 
     signup(email: string, password: string): Observable<AuthResponseData> {
         return this.http.post<AuthResponseData>('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyDbD0byEVO9ltiAwKgd_gilcZ3XVagcno0',
@@ -39,6 +40,11 @@ export class AuthService {
     logout(){
         this.user.next(null);
         this.router.navigate(['/']);
+        localStorage.removeItem('userData');
+        if(this.logoutTimer){
+            clearTimeout(this.logoutTimer);
+        }
+        this.logoutTimer = null;
     }
 
     autoLogin(){
@@ -54,17 +60,28 @@ export class AuthService {
             return;
         }
 
-        const user = new User(userData.email, userData.id, userData._token, new Date(userData._expirationDate));
+        const expirationDate = new Date(userData._expirationDate);
+        const user = new User(userData.email, userData.id, userData._token, expirationDate);
 
         if(user.token){
             this.user.next(user);
+            const expirationDuration = expirationDate.getTime() - new Date().getTime();
+            this.autoLogout(expirationDuration)
         }
     }
+
+    autoLogout(expirationDuration: number){
+        this.logoutTimer = setTimeout(() => {
+            this.logout();
+        }, expirationDuration);
+    }
+
 
     private handleLogUser(email: string, localId: string, idToken: string, expiresIn: number) {
         const expirationDate = new Date(new Date().getTime() + expiresIn * 1000);
         const user = new User(email, localId, idToken, expirationDate);
         this.user.next(user);
+        this.autoLogout(expiresIn * 1000);
         localStorage.setItem('userData', JSON.stringify(user));
     }
 
