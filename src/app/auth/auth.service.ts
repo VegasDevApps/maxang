@@ -3,6 +3,7 @@ import { Injectable } from "@angular/core";
 import { Router } from "@angular/router";
 import { BehaviorSubject, catchError, Observable, Subject, tap, throwError } from "rxjs";
 import { User } from "./user.model";
+import { environment } from "../../environments/environment";
 
 export interface AuthResponseData {
     idToken: string;
@@ -22,7 +23,7 @@ export class AuthService {
     private logoutTimer: any = null;
 
     signup(email: string, password: string): Observable<AuthResponseData> {
-        return this.http.post<AuthResponseData>('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyDbD0byEVO9ltiAwKgd_gilcZ3XVagcno0',
+        return this.http.post<AuthResponseData>(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${ environment.fireBaseAPIKey }`,
             { email, password, returnSecureToken: true })
             .pipe(catchError(this.handlerError), tap(response => {
                 this.handleLogUser(response.email, response.localId, response.idToken, +response.expiresIn);
@@ -30,7 +31,7 @@ export class AuthService {
     }
 
     login(email: string, password: string): Observable<AuthResponseData> {
-        return this.http.post<AuthResponseData>('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDbD0byEVO9ltiAwKgd_gilcZ3XVagcno0',
+        return this.http.post<AuthResponseData>(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${environment.fireBaseAPIKey}`,
             { email, password, returnSecureToken: true })
             .pipe(catchError(this.handlerError), tap(response => {
                 this.handleLogUser(response.email, response.localId, response.idToken, +response.expiresIn);
