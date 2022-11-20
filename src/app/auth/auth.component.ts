@@ -1,4 +1,4 @@
-import { Component, ComponentFactoryResolver, OnDestroy, ViewChild } from "@angular/core";
+import { Component, OnDestroy, ViewChild } from "@angular/core";
 import { NgForm } from "@angular/forms";
 import { Router } from "@angular/router";
 import { Observable, Subscription } from "rxjs";
@@ -15,8 +15,7 @@ export class AuthComponent implements OnDestroy {
 
     constructor(
         private authService: AuthService, 
-        private router: Router, 
-        private componentFactoryResolver: ComponentFactoryResolver){}
+        private router: Router){}
 
     isLoginMode = true;
     isLoading = false;
