@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
+import { map } from 'rxjs/operators';
 import { RecipeService } from '../recipe.service';
 
 @Component({
@@ -29,6 +30,10 @@ export class RecipeEditComponent implements OnInit {
       this.editMode = param['id'] != null;
       this.initForm();
     });
+
+    this.route.params.pipe(map((param: Params) => {
+      return +param['id'];
+  )
   }
 
   private initForm() {
