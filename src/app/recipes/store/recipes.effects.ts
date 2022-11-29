@@ -1,10 +1,12 @@
 import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { switchMap } from "rxjs";
-import { map } from "rxjs/operators";
+import { map, withLatestFrom } from "rxjs/operators";
 import { HttpClient } from "@angular/common/http";
 import { Recipe } from "../recipe.model";
 import * as RecipesActions from './recipes.actions';
+import * as fromApp from '../../store/app.reducer';
+import { Store } from "@ngrx/store";
 
 
 @Injectable({providedIn: "root"})
@@ -32,9 +34,23 @@ export class RecipesEffects {
         );
     });
 
+    storeRecipes = createEffect(() => {
+        return this.actions$.pipe(
+            ofType(RecipesActions.STORE_RECIPES),
+            withLatestFrom(this.store.select('recipes')),
+            switchMap(([actionData, recipesState]) => {
+                return this.http.put(
+                    'https://maxang-df23e-default-rtdb.europe-west1.firebasedatabase.app/recipes.json',
+                    recipesState.recipes
+                )
+            })
+        );
+    }, {dispatch: false});
+
     constructor(
         private actions$: Actions,
-        private http: HttpClient
+        private http: HttpClient,
+        private store: Store<fromApp.AppState>
     ) { }
     
 }
